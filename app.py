@@ -107,7 +107,10 @@ HOME_TEMPLATE = """
             </div>
         </div>
         
-        <a href="/assessment" class="btn">Prova Demo Assessment →</a>
+       <div style="display: flex; gap: 20px; margin-top: 20px;">
+        <a href="/assessment" class="btn">📊 Inizia Assessment →</a>
+        <a href="/demo" class="btn" style="background: #6b7280;">📈 Demo JSON</a>
+    </div>
     </div>
 </body>
 </html>
