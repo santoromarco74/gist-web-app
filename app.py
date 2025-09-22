@@ -91,3 +91,49 @@ HOME_TEMPLATE = """
             </div>
             <div class="info-card">
                 <h3>☁️ Architecture (32%)</h3>
+                <p>Cloud-hybrid, microservizi, automazione</p>
+            </div>
+            <div class="info-card">
+                <h3>⚡ Physical (18%)</h3>
+                <p>Infrastruttura, connettività, resilienza</p>
+            </div>
+            <div class="info-card">
+                <h3>📋 Compliance (22%)</h3>
+                <p>GDPR, PCI-DSS, NIS2 integrati</p>
+            </div>
+            <div class="info-card">
+                <h3>🎯 Target</h3>
+                <p>PMI della GDO italiana (20-200 PdV)</p>
+            </div>
+        </div>
+        
+        <a href="/demo" class="btn">Prova Demo Assessment →</a>
+    </div>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HOME_TEMPLATE)
+
+@app.route('/demo')
+def demo():
+    return jsonify({
+        "message": "Demo assessment coming soon!",
+        "components": {
+            "physical": "18%",
+            "architectural": "32%",
+            "security": "28%",
+            "compliance": "22%"
+        },
+        "sample_score": 67.5
+    })
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy", "version": "1.0.0"})
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
