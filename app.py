@@ -113,6 +113,8 @@ HOME_TEMPLATE = """
 </html>
 """
 
+
+
 @app.route('/')
 def index():
     return render_template_string(HOME_TEMPLATE)
@@ -133,6 +135,102 @@ def demo():
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "version": "1.0.0"})
+
+
+# Aggiungi questo al tuo app.py
+
+ASSESSMENT_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GIST Assessment - Valutazione</title>
+    <style>
+        /* Stesso stile base */
+        body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f3f4f6; }
+        .container { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { color: #1f2937; }
+        
+        .question { margin: 20px 0; padding: 20px; background: #f9fafb; border-radius: 8px; }
+        .question h3 { margin: 0 0 10px 0; color: #374151; }
+        .options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .option { padding: 10px 20px; border: 2px solid #e5e7eb; border-radius: 6px; cursor: pointer; background: white; }
+        .option:hover { border-color: #3b82f6; }
+        .option.selected { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .progress { height: 8px; background: #e5e7eb; border-radius: 4px; margin: 20px 0; }
+        .progress-fill { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; }
+        .btn-submit { background: #10b981; color: white; padding: 12px 40px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Assessment GIST</h1>
+        <div class="progress"><div class="progress-fill" style="width: 25%"></div></div>
+        
+        <form method="POST" action="/calculate">
+            <!-- FISICA (18%) -->
+            <div class="question">
+                <h3>1. Quanti punti vendita gestisci?</h3>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q1" value="10"> 1-10</label>
+                    <label class="option"><input type="radio" name="q1" value="30"> 11-50</label>
+                    <label class="option"><input type="radio" name="q1" value="60"> 51-100</label>
+                    <label class="option"><input type="radio" name="q1" value="80"> 100+</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>2. Quale tipo di backup energetico hai?</h3>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q2" value="0"> Nessuno</label>
+                    <label class="option"><input type="radio" name="q2" value="40"> UPS base (15 min)</label>
+                    <label class="option"><input type="radio" name="q2" value="70"> UPS ridondante (1h+)</label>
+                    <label class="option"><input type="radio" name="q2" value="100"> Generatore + UPS</label>
+                </div>
+            </div>
+            
+            <!-- Aggiungi altre domande... -->
+            
+            <button type="submit" class="btn-submit">Calcola GIST Score →</button>
+        </form>
+    </div>
+</body>
+</html>
+"""
+
+@app.route('/assessment')
+def assessment():
+    return render_template_string(ASSESSMENT_TEMPLATE)
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    # Raccogli le risposte
+    answers = request.form.to_dict()
+    
+    # Calcolo semplificato per MVP
+    total = sum([int(v) for v in answers.values() if v.isdigit()])
+    num_questions = len(answers)
+    score = (total / (num_questions * 100)) * 100 if num_questions > 0 else 0
+    
+    # Determina livello maturità
+    if score < 25:
+        maturity = "Iniziale"
+    elif score < 50:
+        maturity = "In Sviluppo"  
+    elif score < 75:
+        maturity = "Avanzato"
+    else:
+        maturity = "Ottimizzato"
+    
+    return f"""
+    <html>
+        <head><title>GIST Score - Risultato</title></head>
+        <body style="font-family: sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
+            <h1>Il tuo GIST Score: {score:.1f}/100</h1>
+            <h2>Livello: {maturity}</h2>
+            <a href="/">← Torna alla Home</a>
+        </body>
+    </html>
+    """
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
