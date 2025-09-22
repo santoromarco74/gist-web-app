@@ -107,7 +107,7 @@ HOME_TEMPLATE = """
             </div>
         </div>
         
-        <a href="/demo" class="btn">Prova Demo Assessment →</a>
+        <a href="/assessment" class="btn">Prova Demo Assessment →</a>
     </div>
 </body>
 </html>
