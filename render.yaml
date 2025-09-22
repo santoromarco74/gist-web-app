@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gist-assessment
+    env: python
+    repo: https://github.com/santoromarco74/gist-web-app.git
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:create_app
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
