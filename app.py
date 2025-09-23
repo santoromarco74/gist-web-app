@@ -1,7 +1,7 @@
-# app.py
+# app.py - CORRETTO
 from flask import Flask, render_template, request, jsonify
-from app.gist_calculator import GISTCalculator
-from app.questionnaire import QUESTIONNAIRE
+from gist_calculator import GISTCalculator  # Import diretto senza app.
+from questionnaire import QUESTIONNAIRE     # Import diretto
 import json
 
 app = Flask(__name__)
@@ -17,17 +17,13 @@ def assessment():
 
 @app.route('/calculate', methods=['POST'])
 def calculate_gist():
-    answers = request.json
-    
-    calculator = GISTCalculator(answers.get('company_name', 'Anonymous'))
-    results = calculator.calculate_score(answers)
-    
-    return jsonify(results)
-
-@app.route('/report/<gist_score>')
-def detailed_report(gist_score):
-    # Genera report PDF dettagliato
-    return render_template('report.html', score=gist_score)
+    try:
+        answers = request.json
+        calculator = GISTCalculator(answers.get('company_name', 'Anonymous'))
+        results = calculator.calculate_score(answers)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
