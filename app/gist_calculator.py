@@ -1,78 +1,55 @@
-"""
-GIST Calculator Web Wrapper
-Integra il framework GIST per web application
-"""
-import math
-
+# app/gist_calculator.py - Integrato dalla tua tesi
 class GISTCalculator:
-    def __init__(self):
-        # Pesi calibrati dalla tua tesi (pagina 125)
+    def __init__(self, org_name="Web Assessment"):
+        self.org_name = org_name
+        # Pesi calibrati dalla tua ricerca (Tabella B.5)
         self.weights = {
             'physical': 0.18,      # 18%
             'architectural': 0.32, # 32% 
             'security': 0.28,      # 28%
             'compliance': 0.22     # 22%
         }
-        self.gamma = 0.95  # Esponente per rendimenti decrescenti
+        self.gamma = 0.95  # Esponente rendimenti decrescenti
     
-    def calculate_gist_score(self, component_scores):
+    def calculate_score(self, questionnaire_answers):
         """
-        Calcola GIST Score dalle 4 componenti
-        Formula dalla tesi: GIST = Σ(w_k * S_k^γ)
+        Converte risposte questionario in GIST Score
+        Formula dalla tua tesi: GIST = Σ(w_k * S_k^γ)
         """
-        total_score = 0
+        # Converto risposte in punteggi componenti 0-100
+        component_scores = self._answers_to_components(questionnaire_answers)
         
+        # Calcolo GIST Score con la formula originale
+        gist_score = 0
         for component, score in component_scores.items():
-            if component in self.weights:
-                weighted_score = self.weights[component] * (score ** self.gamma)
-                total_score += weighted_score
+            weighted_score = self.weights[component] * (score ** self.gamma)
+            gist_score += weighted_score
         
-        return round(total_score, 1)
+        return {
+            'gist_score': round(gist_score, 1),
+            'component_scores': component_scores,
+            'maturity_level': self._get_maturity_level(gist_score),
+            'recommendations': self._get_recommendations(component_scores),
+            'benchmarks': self._get_sector_benchmarks(component_scores)
+        }
     
-    def get_maturity_level(self, gist_score):
-        """Determina livello maturità da GIST Score"""
-        if gist_score < 25:
-            return "Iniziale"
-        elif gist_score < 50:
-            return "In Sviluppo" 
-        elif gist_score < 75:
-            return "Avanzato"
-        else:
-            return "Ottimizzato"
-    
-    def get_recommendations(self, component_scores):
-        """Genera raccomandazioni basate sui gap"""
-        recommendations = []
-        
-        # Target per settore GDO (dalla tua analisi)
-        targets = {
-            'physical': 65,
-            'architectural': 70,
-            'security': 68,
-            'compliance': 75
+    def _get_sector_benchmarks(self, scores):
+        """Benchmark vs medie settore dalla tua Tabella 5.4"""
+        sector_averages = {
+            'physical': 51.2,      # Media settore GDO italiano
+            'architectural': 45.8,
+            'security': 48.3,
+            'compliance': 52.7
         }
         
-        for component, score in component_scores.items():
-            gap = targets[component] - score
-            if gap > 10:  # Gap significativo
-                priority = "Alta" if gap > 20 else "Media"
-                recommendations.append({
-                    'component': component.title(),
-                    'current': score,
-                    'target': targets[component], 
-                    'gap': gap,
-                    'priority': priority,
-                    'action': self._get_component_action(component, gap)
-                })
+        benchmarks = {}
+        for component, score in scores.items():
+            avg = sector_averages[component]
+            benchmarks[component] = {
+                'score': score,
+                'sector_avg': avg,
+                'vs_sector': score - avg,
+                'percentile': self._calculate_percentile(component, score)
+            }
         
-        return sorted(recommendations, key=lambda x: x['gap'], reverse=True)
-    
-    def _get_component_action(self, component, gap):
-        """Azioni specifiche per componente"""
-        actions = {
-            'physical': "Upgrade alimentazione ridondante e connettività backup",
-            'architectural': "Migrazione cloud ibrido e implementazione microservizi", 
-            'security': "Implementazione Zero Trust e SOC 24/7",
-            'compliance': "Automazione controlli e continuous compliance monitoring"
-        }
-        return actions.get(component, "Miglioramento generale richiesto")
+        return benchmarks
