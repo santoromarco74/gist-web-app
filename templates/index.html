@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIST Score Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; background-color: #f4f7f9; }
+        h1, h2, h3 { color: #2c3e50; }
+        .container { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+        .form-container { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .chart-container { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .risultato { width: 100%; margin-top: 20px; padding: 20px; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        label { font-weight: bold; }
+        input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; }
+        button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+    <h1>GIST Framework - Calcolatore di Maturità Digitale</h1>
+    
+    <div class="container">
+        <div class="form-container">
+            <p>Inserisci i punteggi (0-100) per calcolare il GIST Score.</p>
+            <form action="/calcola" method="post">
+                <div style="margin-bottom: 15px;">
+                    <label for="fisica">Dimensione Fisica</label>
+                    <input type="number" id="fisica" name="fisica" min="0" max="100" required value="{{ valori_inseriti.fisica if valori_inseriti else 50 }}">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="architetturale">Dimensione Architetturale</label>
+                    <input type="number" id="architetturale" name="architetturale" min="0" max="100" required value="{{ valori_inseriti.architetturale if valori_inseriti else 50 }}">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="sicurezza">Dimensione Sicurezza</label>
+                    <input type="number" id="sicurezza" name="sicurezza" min="0" max="100" required value="{{ valori_inseriti.sicurezza if valori_inseriti else 50 }}">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="conformita">Dimensione Conformità</label>
+                    <input type="number" id="conformita" name="conformita" min="0" max="100" required value="{{ valori_inseriti.conformita if valori_inseriti else 50 }}">
+                </div>
+                <button type="submit">Calcola GIST Score</button>
+            </form>
+        </div>
+
+        {% if risultato %}
+        <div class="chart-container">
+            <h3>Profilo di Maturità</h3>
+            <canvas id="graficoRadar"></canvas>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if risultato %}
+    <div class="risultato">
+        <h2>Risultati</h2>
+        <h3>GIST Score Calcolato: <strong>{{ risultato }} / 100</strong></h3>
+        <h3>Livello di Maturità: <strong>{{ livello_maturita }}</strong></h3>
+    </div>
+    {% endif %}
+
+    <script>
+        {% if dati_grafico %}
+            const ctx = document.getElementById('graficoRadar');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Fisica', 'Architetturale', 'Sicurezza', 'Conformità'],
+                    datasets: [{
+                        label: 'Punteggio Attuale',
+                        data: {{ dati_grafico | tojson }},
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                    }]
+                },
+                options: {
+                    scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+                }
+            });
+        {% endif %}
+    </script>
+</body>
+</html>
