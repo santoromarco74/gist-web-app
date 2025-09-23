@@ -203,34 +203,175 @@ def assessment():
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    # Raccogli le risposte
+    """
+    Calcola il GIST Score basato sulle risposte del questionario
+    """
+    # Raccogli tutte le risposte dal form
     answers = request.form.to_dict()
     
-    # Calcolo semplificato per MVP
-    total = sum([int(v) for v in answers.values() if v.isdigit()])
-    num_questions = len(answers)
-    score = (total / (num_questions * 100)) * 100 if num_questions > 0 else 0
+    # Liste delle domande per componente
+    physical_questions = ['pv_count', 'backup_power', 'connectivity']
+    architectural_questions = ['cloud_percent', 'automation']
+    security_questions = []  # Aggiungeremo dopo
+    compliance_questions = []  # Aggiungeremo dopo
     
-    # Determina livello maturità
-    if score < 25:
-        maturity = "Iniziale"
-    elif score < 50:
-        maturity = "In Sviluppo"  
-    elif score < 75:
-        maturity = "Avanzato"
+    # Funzione helper per calcolare media sicura
+    def calculate_average(questions, answers):
+        scores = []
+        for q in questions:
+            if q in answers:
+                try:
+                    scores.append(float(answers[q]))
+                except (ValueError, TypeError):
+                    scores.append(0)
+        return sum(scores) / len(scores) if scores else 0
+    
+    # Calcola i punteggi per ogni componente
+    physical = calculate_average(physical_questions, answers)
+    architectural = calculate_average(architectural_questions, answers)
+    
+    # Per demo, usa valori fissi per security e compliance se non ci sono domande
+    if not security_questions:
+        # Usa un valore medio-alto per demo
+        security = 65  
     else:
-        maturity = "Ottimizzato"
+        security = calculate_average(security_questions, answers)
+        
+    if not compliance_questions:
+        # Usa un valore medio-alto per demo
+        compliance = 70
+    else:
+        compliance = calculate_average(compliance_questions, answers)
     
-    return f"""
-    <html>
-        <head><title>GIST Score - Risultato</title></head>
-        <body style="font-family: sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
-            <h1>Il tuo GIST Score: {score:.1f}/100</h1>
-            <h2>Livello: {maturity}</h2>
-            <a href="/">← Torna alla Home</a>
-        </body>
-    </html>
-    """
+    # Se non ci sono risposte, usa valori demo
+    if physical == 0:
+        physical = 60
+    if architectural == 0:
+        architectural = 55
+    
+    # FORMULA GIST CORRETTA CON NORMALIZZAZIONE
+    gamma = 0.95
+    weights = {
+        'physical': 0.18,
+        'architectural': 0.32,
+        'security': 0.28,
+        'compliance': 0.22
+    }
+    
+    # Calcolo del GIST Score raw
+    gist_score_raw = (
+        weights['physical'] * (physical ** gamma) +
+        weights['architectural'] * (architectural ** gamma) +
+        weights['security'] * (security ** gamma) +
+        weights['compliance'] * (compliance ** gamma)
+    )
+    
+    # NORMALIZZAZIONE: Il massimo teorico con tutti 100 è ~79.43
+    # Quindi normalizziamo per avere 100 come massimo
+    MAX_THEORETICAL_SCORE = (
+        weights['physical'] * (100 ** gamma) +
+        weights['architectural'] * (100 ** gamma) +
+        weights['security'] * (100 ** gamma) +
+        weights['compliance'] * (100 ** gamma)
+    )
+    
+    # Score normalizzato 0-100
+    gist_score = (gist_score_raw / MAX_THEORETICAL_SCORE) * 100
+    
+    # Ora i livelli di maturità hanno più senso
+    if gist_score < 25:
+        maturity_level = "Iniziale"
+        maturity_description = "Infrastruttura legacy, necessita trasformazione urgente"
+    elif gist_score < 50:
+        maturity_level = "In Sviluppo"
+        maturity_description = "Modernizzazione in corso, sulla strada giusta"
+    elif gist_score < 75:
+        maturity_level = "Avanzato"
+        maturity_description = "Infrastruttura moderna e competitiva"
+    else:
+        maturity_level = "Ottimizzato"
+        maturity_description = "🏆 Eccellenza digitale! Best-in-class nel settore GDO"
+    
+    # Come raggiungere l'eccellenza - raccomandazioni specifiche
+    recommendations = []
+    
+    # Calcola gap dall'eccellenza per ogni componente
+    gaps = {
+        'Infrastruttura Fisica': (100 - physical, physical),
+        'Architettura IT': (100 - architectural, architectural),
+        'Sicurezza': (100 - security, security),
+        'Conformità': (100 - compliance, compliance)
+    }
+    
+    # Ordina per gap maggiore (maggior potenziale di miglioramento)
+    sorted_gaps = sorted(gaps.items(), key=lambda x: x[1][0], reverse=True)
+    
+    # Raccomandazioni per raggiungere l'eccellenza
+    for component_name, (gap, current_score) in sorted_gaps[:3]:
+        if gap > 30:  # Solo se c'è un gap significativo
+            if component_name == 'Infrastruttura Fisica':
+                if current_score < 70:
+                    recommendations.append({
+                        'title': f'⚡ Potenzia Infrastruttura (attuale: {current_score:.0f}/100)',
+                        'description': 'Per l\'eccellenza: Data center Tier III+, fibra 100% PdV, UPS+generatori ridondanti, edge computing distribuito',
+                        'priority': 'priority-high' if gap > 50 else 'priority-medium'
+                    })
+            elif component_name == 'Architettura IT':
+                if current_score < 70:
+                    recommendations.append({
+                        'title': f'☁️ Modernizza Architettura (attuale: {current_score:.0f}/100)',
+                        'description': 'Per l\'eccellenza: 100% cloud-native, microservizi, CI/CD completo, IaC, auto-scaling, multi-cloud orchestration',
+                        'priority': 'priority-high' if gap > 50 else 'priority-medium'
+                    })
+            elif component_name == 'Sicurezza':
+                if current_score < 70:
+                    recommendations.append({
+                        'title': f'🔒 Rafforza Sicurezza (attuale: {current_score:.0f}/100)',
+                        'description': 'Per l\'eccellenza: Zero Trust completo, SOC 24/7 con AI, patch 0-day automatiche, pen-test mensili',
+                        'priority': 'priority-high' if gap > 50 else 'priority-medium'
+                    })
+            elif component_name == 'Conformità':
+                if current_score < 70:
+                    recommendations.append({
+                        'title': f'📋 Perfeziona Conformità (attuale: {current_score:.0f}/100)',
+                        'description': 'Per l\'eccellenza: Compliance-as-code, audit continui automatizzati, certificazioni multiple (ISO 27001, SOC2)',
+                        'priority': 'priority-high' if gap > 50 else 'priority-medium'
+                    })
+    
+    # Se il punteggio è già alto, dai consigli per mantenere l'eccellenza
+    if gist_score >= 75:
+        recommendations.append({
+            'title': '🏆 Mantieni l\'Eccellenza',
+            'description': 'Sei nel top 5% del settore! Focus su: innovazione continua, AI/ML adoption, quantum-ready security',
+            'priority': 'priority-low'
+        })
+        recommendations.append({
+            'title': '🚀 Diventa un Leader',
+            'description': 'Condividi best practices, partecipa a conferenze, ottieni certificazioni avanzate, mentora altre aziende',
+            'priority': 'priority-low'
+        })
+    
+    # Aggiungi sempre un consiglio su come migliorare il punteggio
+    potential_improvement = min(100 - gist_score, 25)  # Max 25 punti di miglioramento suggerito
+    if gist_score < 90:
+        recommendations.append({
+            'title': f'📈 Potenziale: +{potential_improvement:.0f} punti',
+            'description': f'Con investimenti mirati puoi raggiungere un GIST Score di {min(gist_score + potential_improvement, 100):.0f}/100',
+            'priority': 'priority-medium'
+        })
+    
+    # Renderizza il template con tutti i dati
+    return render_template_string(
+        RESULTS_TEMPLATE,
+        score=gist_score,
+        maturity_level=maturity_level,
+        maturity_description=maturity_description,
+        physical=physical,
+        architectural=architectural,
+        security=security,
+        compliance=compliance,
+        recommendations=recommendations
+    )
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
