@@ -30,6 +30,8 @@ def index():
     return render_template('index.html')
 
 # La rotta deve essere esattamente "/calcola" e deve accettare il metodo 'POST'
+# app.py (solo la funzione 'calcola' modificata)
+
 @app.route('/calcola', methods=['POST'])
 def calcola():
     """Riceve i dati, calcola e mostra i risultati."""
@@ -43,16 +45,19 @@ def calcola():
         
         score_calcolato = calcola_gist_score(punteggi)
         livello = determina_livello_maturita(score_calcolato)
-        
         punteggi_per_grafico = list(punteggi.values())
+
+        # --- NOVITÀ: Definiamo i dati per il nostro benchmark ---
+        # Questi valori rappresentano un'organizzazione "ottimizzata" (Livello Avanzato/Ottimizzato)
+        benchmark_target = [85, 88, 82, 86]
 
         return render_template('index.html', 
                                risultato=score_calcolato, 
                                livello_maturita=livello,
                                valori_inseriti=punteggi,
-                               dati_grafico=punteggi_per_grafico)
+                               dati_grafico=punteggi_per_grafico,
+                               dati_benchmark=benchmark_target) # Passiamo i nuovi dati!
     except (ValueError, KeyError):
-        # Gestisce il caso in cui i dati non siano corretti
         return "Errore nei dati inseriti. Assicurati di compilare tutti i campi con numeri.", 400
 
 # Questa parte non è strettamente necessaria per Render, ma è utile per testare in locale

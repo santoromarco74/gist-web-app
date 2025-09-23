@@ -61,27 +61,41 @@
     </div>
     {% endif %}
 
+
     <script>
-        {% if dati_grafico %}
-            const ctx = document.getElementById('graficoRadar');
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Fisica', 'Architetturale', 'Sicurezza', 'Conformità'],
-                    datasets: [{
-                        label: 'Punteggio Attuale',
-                        data: {{ dati_grafico | tojson }},
-                        fill: true,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgb(54, 162, 235)',
-                        pointBackgroundColor: 'rgb(54, 162, 235)',
-                    }]
+    {% if dati_grafico %}
+        const ctx = document.getElementById('graficoRadar');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Fisica', 'Architetturale', 'Sicurezza', 'Conformità'],
+                // 'datasets' è una lista. Ora conterrà due oggetti!
+                datasets: [
+                {
+                    label: 'Punteggio Attuale',
+                    data: {{ dati_grafico | tojson }},
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
                 },
-                options: {
-                    scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+                // --- NOVITÀ: Il nostro secondo dataset per il benchmark ---
+                {
+                    label: 'Benchmark Target',
+                    data: {{ dati_benchmark | tojson }}, // Usiamo i dati del benchmark
+                    fill: true,
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)', // Un colore diverso (verde)
+                    borderColor: 'rgb(46, 204, 113)',
+                    pointBackgroundColor: 'rgb(46, 204, 113)',
                 }
-            });
+            ]
+            },
+            options: {
+                scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+            }
+        });
         {% endif %}
     </script>
+
 </body>
 </html>
