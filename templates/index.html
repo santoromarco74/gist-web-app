@@ -16,7 +16,23 @@
         input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; }
         button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
         button:hover { background-color: #2980b9; }
-    </style>
+       
+
+.raccomandazione { 
+    width: 100%; 
+    margin-top: 20px; 
+    padding: 20px; 
+    border-radius: 8px; 
+    background-color: #e8f6fd; /* Un colore azzurrino per evidenziare */
+    border-left: 5px solid #3498db; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.raccomandazione p {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+</style>
+
 </head>
 <body>
     <h1>GIST Framework - Calcolatore di Maturità Digitale</h1>
@@ -60,6 +76,18 @@
         <h3>Livello di Maturità: <strong>{{ livello_maturita }}</strong></h3>
     </div>
     {% endif %}
+    {% if risultato %}
+    <div class="risultato">
+        </div>
+    {% endif %}
+
+    {% if raccomandazione %}
+    <div class="raccomandazione">
+        <h2>💡 Raccomandazione Prioritaria</h2>
+        <p>{{ raccomandazione }}</p>
+    </div>
+    {% endif %}
+
 
 
     <script>
