@@ -1,19 +1,16 @@
 # Core Flask
 Flask==2.3.3
-gunicorn==21.2.0
+gunicorn
 
 # Build dependencies
-setuptools==68.0.0
-wheel==0.41.2
-
-# Optional - aggiungi solo se necessario
-python-dotenv==1.0.0
+setuptools
+wheel
 
 
 
-# Quando aggiungi funzionalità:
-pandas==2.0.3
-numpy==1.24.3
+# # Quando aggiungi funzionalità:
+# pandas==2.0.3
+# numpy==1.24.3
 
 WeasyPrint==57.1.0
 
