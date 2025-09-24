@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Report di Assessment GIST</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #333; }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px;}
+        .riepilogo { text-align: center; margin: 30px 0; font-size: 1.2em; }
+        .chart-container { text-align: center; margin: 30px 0; }
+        .chart-container img { max-width: 80%; height: auto; }
+        .analisi-card { border: 1px solid #ddd; margin-bottom: 15px; padding: 15px; border-radius: 5px; page-break-inside: avoid; }
+        .card-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .card-header h3 { margin: 0; }
+        .status-label { font-weight: bold; float: right; }
+        .status-area-critica { color: #e74c3c; }
+        .status-da-migliorare { color: #f39c12; }
+        .status-punto-di-forza { color: #2ecc71; }
+        footer { position: fixed; bottom: -1.5cm; left: 0; right: 0; text-align: center; font-size: 0.8em; color: #777; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Report di Assessment GIST</h1>
+    </header>
+    
+    <div class="riepilogo">
+        <strong>GIST Score Finale:</strong> {{ risultato }} / 100 <br>
+        <strong>Livello di Maturità:</strong> {{ livello_maturita }}
+    </div>
+
+    <div class="chart-container">
+        <h2>Profilo di Maturità</h2>
+        <img src="{{ chart_image }}" alt="Grafico Radar Profilo di Maturità">
+    </div>
+
+    <h2>Analisi Dettagliata</h2>
+    {% for item in analisi %}
+    <div class="analisi-card">
+        <div class="card-header">
+            <h3>{{ item.dimensione }} <span class="status-label status-{{ item.status | lower | replace(' ', '-') }}">{{ item.status }}</span></h3>
+        </div>
+        <p>{{ item.consiglio }}</p>
+    </div>
+    {% endfor %}
+    
+    <footer>
+        Report generato da GIST Web App - {{ "now" | strftime("%d/%m/%Y") }}
+    </footer>
+</body>
+</html>
