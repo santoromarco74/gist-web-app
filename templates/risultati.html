@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultati Assessment GIST</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; background-color: #f4f7f9; }
+        h1, h2, h3 { color: #2c3e50; }
+        .container { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+        .chart-container { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .risultato { width: 100%; margin-top: 20px; padding: 20px; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .raccomandazione { width: 100%; margin-top: 20px; padding: 20px; border-radius: 8px; background-color: #e8f6fd; border-left: 5px solid #3498db; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .raccomandazione p { font-size: 1.1em; line-height: 1.6; }
+        a.back-button { display: inline-block; margin-top: 20px; text-decoration: none; padding: 10px 20px; background-color: #95a5a6; color: white; border-radius: 4px;}
+    </style>
+</head>
+<body>
+    <h1>Risultati del Tuo Assessment GIST</h1>
+    
+    <div class="container">
+        <div class="chart-container">
+            <h3>Profilo di Maturità</h3>
+            <canvas id="graficoRadar"></canvas>
+        </div>
+        <div class="risultato" style="flex: 1; min-width: 300px;">
+            <h2>Riepilogo</h2>
+            <h3>GIST Score Calcolato: <strong>{{ risultato }} / 100</strong></h3>
+            <h3>Livello di Maturità: <strong>{{ livello_maturita }}</strong></h3>
+        </div>
+    </div>
+    
+    {% if raccomandazione %}
+    <div class="raccomandazione">
+        <h2>💡 Raccomandazione Prioritaria</h2>
+        <p>{{ raccomandazione }}</p>
+    </div>
+    {% endif %}
+    
+    <a href="/" class="back-button">Torna al Questionario</a>
+
+    <script>
+        const ctx = document.getElementById('graficoRadar');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Fisica', 'Architetturale', 'Sicurezza', 'Conformità'],
+                datasets: [
+                {
+                    label: 'Punteggio Attuale',
+                    data: {{ dati_grafico | tojson }},
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                },
+                {
+                    label: 'Benchmark Target',
+                    data: {{ dati_benchmark | tojson }},
+                    fill: true,
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                    borderColor: 'rgb(46, 204, 113)',
+                }
+            ]
+            },
+            options: {
+                scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+            }
+        });
+    </script>
+</body>
+</html>

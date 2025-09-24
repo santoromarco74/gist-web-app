@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionario di Assessment GIST</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; background-color: #f4f7f9; }
+        h1, h2 { color: #2c3e50; text-align: center; }
+        #questionarioForm { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { font-weight: bold; display: block; margin-bottom: 10px; font-size: 1.1em; }
+        .radio-option { margin-bottom: 10px; }
+        .radio-option input { margin-right: 10px; }
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+        button { padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #2980b9; }
+        button[type="submit"] { background-color: #2ecc71; }
+        button[type="submit"]:hover { background-color: #27ae60; }
+        #prevBtn { background-color: #95a5a6; }
+        #prevBtn:hover { background-color: #7f8c8d; }
+        #progressBar { width: 100%; background-color: #ddd; border-radius: 5px; margin-bottom: 20px;}
+        #progress { width: 25%; height: 15px; background-color: #3498db; border-radius: 5px; transition: width 0.3s ease-in-out;}
+    </style>
+</head>
+<body>
+    <h1>Assessment di Maturità GIST</h1>
+    <p style="text-align: center; margin-bottom: 20px;">Rispondi a queste domande per generare un'analisi della tua infrastruttura IT.</p>
+
+    <div id="progressBar"><div id="progress"></div></div>
+
+    <form id="questionarioForm" action="/calcola" method="post">
+        <!-- Step 1: Dimensione Fisica -->
+        <div class="step active">
+            <h2>Dimensione Fisica</h2>
+            <div class="form-group">
+                <label>1. Qual è il livello di ridondanza del sistema di alimentazione (UPS) nei tuoi data center o locali tecnici principali?</label>
+                <div class="radio-option"><input type="radio" name="alimentazione" value="0" required> Nessun UPS o autonomia inferiore a 15 min.</div>
+                <div class="radio-option"><input type="radio" name="alimentazione" value="10"> UPS base (N+1) con autonomia di almeno 30 min.</div>
+                <div class="radio-option"><input type="radio" name="alimentazione" value="20"> Sistema completamente ridondante (2N) e testato regolarmente.</div>
+            </div>
+            <div class="form-group">
+                <label>2. Qual è la tecnologia di connettività di rete prevalente per i tuoi punti vendita?</label>
+                <div class="radio-option"><input type="radio" name="connettivita" value="5" required> Prevalentemente ADSL/rame.</div>
+                <div class="radio-option"><input type="radio" name="connettivita" value="10"> Fibra ottica (FTTC/FTTH) come connessione primaria.</div>
+                <div class="radio-option"><input type="radio" name="connettivita" value="20"> Rete SD-WAN con connettività multipla (Fibra + 4G/5G).</div>
+            </div>
+             <div class="form-group">
+                <label>3. Come viene monitorata l'infrastruttura fisica (temperatura, alimentazione)?</label>
+                <div class="radio-option"><input type="radio" name="monitoraggio_fisico" value="5" required> Controllo manuale o solo alert locali.</div>
+                <div class="radio-option"><input type="radio" name="monitoraggio_fisico" value="10"> Sistema di monitoraggio centralizzato con alert automatici.</div>
+                <div class="radio-option"><input type="radio" name="monitoraggio_fisico" value="15"> Monitoraggio predittivo basato su sensori IoT e analisi dati.</div>
+            </div>
+        </div>
+
+        <!-- Step 2: Dimensione Architetturale -->
+        <div class="step">
+            <h2>Dimensione Architetturale</h2>
+            <div class="form-group">
+                <label>1. Come descriveresti l'architettura delle tue applicazioni core-business (es. ERP, gestione vendite)?</label>
+                <div class="radio-option"><input type="radio" name="arch_core" value="5" required> Monolitica, prevalentemente on-premise.</div>
+                <div class="radio-option"><input type="radio" name="arch_core" value="15"> Ibrida, con alcuni servizi migrati su cloud (IaaS/PaaS).</div>
+                <div class="radio-option"><input type="radio" name="arch_core" value="25"> Prevalentemente Cloud-Native e basata su Microservizi.</div>
+            </div>
+            <div class="form-group">
+                <label>2. Qual è la tua strategia di Disaster Recovery per i sistemi critici?</label>
+                <div class="radio-option"><input type="radio" name="disaster_recovery" value="5" required> Backup periodici su nastro/disco, ripristino manuale.</div>
+                <div class="radio-option"><input type="radio" name="disaster_recovery" value="10"> Sito di DR (warm/hot site) con procedure di failover manuali o semi-automatiche.</div>
+                <div class="radio-option"><input type="radio" name="disaster_recovery" value="20"> Architettura Active-Active multi-region/multi-cloud con failover automatico.</div>
+            </div>
+            <div class="form-group">
+                <label>3. Come vengono rilasciati gli aggiornamenti software?</label>
+                <div class="radio-option"><input type="radio" name="deployment" value="5" required> Processo manuale con downtime pianificato.</div>
+                <div class="radio-option"><input type="radio" name="deployment" value="10"> Processi parzialmente automatizzati (script di deploy).</div>
+                <div class="radio-option"><input type="radio" name="deployment" value="15"> Pipeline di CI/CD completamente automatizzata con rilasci zero-downtime.</div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Dimensione Sicurezza -->
+        <div class="step">
+            <h2>Dimensione Sicurezza</h2>
+            <div class="form-group">
+                <label>1. Quale paradigma descrive meglio il tuo approccio alla sicurezza di rete?</label>
+                <div class="radio-option"><input type="radio" name="modello_sicurezza" value="10" required> Sicurezza perimetrale (firewall, antivirus).</div>
+                <div class="radio-option"><input type="radio" name="modello_sicurezza" value="20"> "Defense-in-depth" con segmentazione di rete, SIEM e EDR.</div>
+                <div class="radio-option"><input type="radio" name="modello_sicurezza" value="30"> Approccio Zero Trust implementato, con micro-segmentazione e verifica continua.</div>
+            </div>
+             <div class="form-group">
+                <label>2. Come gestisci le identità e gli accessi (IAM)?</label>
+                <div class="radio-option"><input type="radio" name="iam" value="5" required> Password gestite localmente, senza autenticazione a più fattori (MFA).</div>
+                <div class="radio-option"><input type="radio" name="iam" value="15"> Single Sign-On (SSO) e MFA implementati per le applicazioni critiche.</div>
+                <div class="radio-option"><input type="radio" name="iam" value="25"> Gestione accessi basata su ruoli (RBAC) e MFA contestuale/adattiva per tutti gli accessi.</div>
+            </div>
+             <div class="form-group">
+                <label>3. Come rispondi a un incidente di sicurezza?</label>
+                <div class="radio-option"><input type="radio" name="incident_response" value="5" required> In modo reattivo e ad-hoc.</div>
+                <div class="radio-option"><input type="radio" name="incident_response" value="10"> Seguendo un piano di Incident Response documentato e testato.</div>
+                <div class="radio-option"><input type="radio" name="incident_response" value="15"> Tramite una piattaforma SOAR che automatizza la raccolta dati e le prime azioni di contenimento.</div>
+            </div>
+        </div>
+
+        <!-- Step 4: Dimensione Conformità -->
+        <div class="step">
+            <h2>Dimensione Conformità</h2>
+             <div class="form-group">
+                <label>1. Come gestisci la conformità a standard multipli (es. GDPR, PCI-DSS)?</label>
+                <div class="radio-option"><input type="radio" name="approccio_conf" value="10" required> In modo separato per ogni standard, con team e controlli dedicati.</div>
+                <div class="radio-option"><input type="radio" name="approccio_conf" value="20"> In modo coordinato, mappando i controlli comuni per evitare duplicazioni.</div>
+                <div class="radio-option"><input type="radio" name="approccio_conf" value="30"> Tramite un framework di controllo unificato e una piattaforma GRC integrata.</div>
+            </div>
+             <div class="form-group">
+                <label>2. Con quale frequenza vengono eseguiti gli audit di conformità?</label>
+                <div class="radio-option"><input type="radio" name="audit" value="5" required> Annualmente, in modo manuale.</div>
+                <div class="radio-option"><input type="radio" name="audit" value="15"> Semestralmente o trimestralmente, con tool di scansione automatizzati.</div>
+                <div class="radio-option"><input type="radio" name="audit" value="25"> Monitoraggio continuo della conformità (Compliance-as-Code).</div>
+            </div>
+            <div class="form-group">
+                <label>3. Come gestisci la classificazione e la protezione dei dati sensibili?</label>
+                <div class="radio-option"><input type="radio" name="data_gov" value="5" required> Basandoci su controlli di accesso manuali.</div>
+                <div class="radio-option"><input type="radio" name="data_gov" value="10"> Con un processo di classificazione dati e crittografia per i dati a riposo più critici.</div>
+                <div class="radio-option"><input type="radio" name="data_gov" value="15"> Tramite strumenti automatici di data discovery, classificazione e Data Loss Prevention (DLP).</div>
+            </div>
+        </div>
+        
+        <div class="navigation-buttons">
+            <button type="button" id="prevBtn" onclick="nextPrev(-1)">Precedente</button>
+            <button type="button" id="nextBtn" onclick="nextPrev(1)">Successivo</button>
+        </div>
+    </form>
+
+    <script>
+        let currentStep = 0;
+        showStep(currentStep);
+
+        function showStep(n) {
+            const steps = document.getElementsByClassName("step");
+            steps[n].classList.add("active");
+            document.getElementById("prevBtn").style.display = n === 0 ? "none" : "inline";
+            if (n === (steps.length - 1)) {
+                document.getElementById("nextBtn").innerHTML = "Calcola Risultati";
+            } else {
+                document.getElementById("nextBtn").innerHTML = "Successivo";
+            }
+             updateProgressBar(n);
+        }
+
+        function nextPrev(n) {
+            const steps = document.getElementsByClassName("step");
+            if (n === 1 && !validateStep()) return false;
+
+            steps[currentStep].classList.remove("active");
+            currentStep = currentStep + n;
+
+            if (currentStep >= steps.length) {
+                document.getElementById("questionarioForm").submit();
+                return false;
+            }
+            showStep(currentStep);
+        }
+
+        function validateStep() {
+            let valid = true;
+            const inputs = document.getElementsByClassName("step")[currentStep].getElementsByTagName("input");
+            let groups = {};
+            for(let i = 0; i < inputs.length; i++) {
+                if(inputs[i].type === 'radio') {
+                    groups[inputs[i].name] = true;
+                }
+            }
+            for(let groupName in groups) {
+                const groupInputs = document.querySelectorAll(`input[name="${groupName}"]`);
+                let groupValid = false;
+                for(let j = 0; j < groupInputs.length; j++) {
+                    if(groupInputs[j].checked) {
+                        groupValid = true;
+                        break;
+                    }
+                }
+                if(!groupValid) {
+                    valid = false;
+                    // Optional: add visual feedback for user
+                }
+            }
+            return valid;
+        }
+
+        function updateProgressBar(n) {
+            const steps = document.getElementsByClassName("step");
+            const progress = document.getElementById("progress");
+            progress.style.width = ((n + 1) / steps.length) * 100 + "%";
+        }
+    </script>
+</body>
+</html>
