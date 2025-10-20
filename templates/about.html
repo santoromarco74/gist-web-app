@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}About - GIST Framework{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        Il Framework GIST
+    </h1>
+    
+    <div class="prose max-w-none">
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                Cos'è il GIST Framework?
+            </h2>
+            <p class="text-gray-700 mb-4">
+                <strong>GIST</strong> (Grande distribuzione - Integrazione Sicurezza e Trasformazione) 
+                è un framework scientifico per la valutazione quantitativa della maturità digitale nel settore 
+                della Grande Distribuzione Organizzata (GDO).
+            </p>
+            <p class="text-gray-700 mb-4">
+                Sviluppato come tesi di laurea magistrale in Cybersecurity e validato empiricamente 
+                su un dataset di 234 organizzazioni, il framework fornisce un indice composito (GIST Score) 
+                che integra quattro dimensioni critiche dell'infrastruttura digitale.
+            </p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                Le 4 Dimensioni
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        1. Infrastruttura Fisica (18%)
+                    </h3>
+                    <p class="text-gray-700">
+                        Valuta l'hardware, i sistemi di alimentazione, la connettività di rete, 
+                        il raffreddamento e la ridondanza. Include anche il monitoraggio proattivo 
+                        e la sicurezza fisica.
+                    </p>
+                </div>
+                
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        2. Architettura (32%) - Peso Maggiore
+                    </h3>
+                    <p class="text-gray-700">
+                        Analizza l'adozione cloud, i pattern architetturali (microservizi, container), 
+                        le pratiche DevOps, la gestione API, l'architettura dati e le strategie 
+                        di disaster recovery. È la dimensione più pesante per il suo ruolo centrale 
+                        nella trasformazione digitale.
+                    </p>
+                </div>
+                
+                <div class="border-l-4 border-red-500 pl-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        3. Sicurezza (28%)
+                    </h3>
+                    <p class="text-gray-700">
+                        Copre tutti gli aspetti di cybersecurity: identity management, network security, 
+                        endpoint protection, crittografia, threat detection, vulnerability management 
+                        e security awareness.
+                    </p>
+                </div>
+                
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        4. Conformità (22%)
+                    </h3>
+                    <p class="text-gray-700">
+                        Integra i requisiti normativi (GDPR, PCI-DSS, NIS2) come elementi nativi 
+                        dell'architettura. Include audit, data governance, risk management e 
+                        gestione dei diritti degli interessati.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                Formula di Calcolo
+            </h2>
+            <p class="text-gray-700 mb-4">
+                Il GIST Score non è una semplice media pesata, ma incorpora effetti non lineari 
+                che riflettono i rendimenti decrescenti tipici degli investimenti in tecnologia:
+            </p>
+            <div class="bg-gray-100 rounded-lg p-6 font-mono text-center text-lg my-4">
+                GIST = Σ(w<sub>k</sub> × S<sub>k</sub><sup>γ</sup>)
+            </div>
+            <p class="text-gray-700 text-sm">
+                dove w<sub>k</sub> sono i pesi calibrati empiricamente, 
+                S<sub>k</sub> sono i punteggi normalizzati 0-100 per ogni componente,
+                e γ = 0.95 è l'esponente per i rendimenti decrescenti.
+            </p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                Livelli di Maturità
+            </h2>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <span class="bg-red-500 text-white px-3 py-1 rounded font-bold mr-4">0-25</span>
+                    <div>
+                        <strong>Iniziale:</strong> Architettura legacy, sicurezza reattiva, 
+                        gap normativi significativi
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-orange-500 text-white px-3 py-1 rounded font-bold mr-4">26-50</span>
+                    <div>
+                        <strong>In Sviluppo:</strong> Modernizzazione parziale in corso, 
+                        sicurezza proattiva, conformità base
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded font-bold mr-4">51-75</span>
+                    <div>
+                        <strong>Avanzato:</strong> Architettura moderna, sicurezza integrata, 
+                        conformità automatizzata
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-green-500 text-white px-3 py-1 rounded font-bold mr-4">76-100</span>
+                    <div>
+                        <strong>Ottimizzato:</strong> Trasformazione completa, sicurezza adattiva, 
+                        compliance-as-code
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-purple-50 rounded-xl border border-purple-200 p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                Validazione Scientifica
+            </h2>
+            <ul class="space-y-2 text-gray-700">
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Validato su <strong>234 organizzazioni</strong> GDO italiane</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Benchmark su <strong>47 catene</strong> con dataset completi</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Simulazioni <strong>Digital Twin</strong> con 10.000 iterazioni Monte Carlo</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Intervalli di confidenza al <strong>95%</strong></span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Pubblicato come <strong>progetto open-source</strong> su GitHub</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="text-center">
+            <a href="/assessment" class="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-4 rounded-lg text-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition shadow-lg">
+                <i class="fas fa-chart-line mr-2"></i> Inizia il Tuo Assessment
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
