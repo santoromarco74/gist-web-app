@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}GIST Score - Risultati{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .score-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .component-bar {
+        transition: width 1s ease-out;
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: scale(0.5); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    .animate-count {
+        animation: countUp 0.5s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-gradient-to-br from-purple-50 to-indigo-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Hero Score Card -->
+        <div class="score-card text-white rounded-2xl shadow-2xl p-8 mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-2" id="org-name">Il Tuo GIST Score</h1>
+            <div class="flex justify-center items-baseline mb-4">
+                <div class="text-7xl font-bold animate-count" id="gist-score">--</div>
+                <div class="text-3xl text-white/80 ml-2">/100</div>
+            </div>
+            <div class="text-2xl font-semibold mb-2" id="maturity-level">--</div>
+            <p class="text-white/90 max-w-2xl mx-auto" id="maturity-description">--</p>
+        </div>
+        
+        <!-- Component Scores Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-blue-500 text-3xl">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-gray-900" id="score-physical">--</div>
+                        <div class="text-sm text-gray-500">/100</div>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Infrastruttura Fisica</h3>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-600 mr-2">vs Settore:</span>
+                    <span id="vs-physical" class="font-semibold">--</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-purple-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-purple-500 text-3xl">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-gray-900" id="score-architectural">--</div>
+                        <div class="text-sm text-gray-500">/100</div>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Architettura</h3>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-600 mr-2">vs Settore:</span>
+                    <span id="vs-architectural" class="font-semibold">--</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-red-500 text-3xl">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-gray-900" id="score-security">--</div>
+                        <div class="text-sm text-gray-500">/100</div>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Sicurezza</h3>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-600 mr-2">vs Settore:</span>
+                    <span id="vs-security" class="font-semibold">--</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-green-500 text-3xl">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-gray-900" id="score-compliance">--</div>
+                        <div class="text-sm text-gray-500">/100</div>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Conformità</h3>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-600 mr-2">vs Settore:</span>
+                    <span id="vs-compliance" class="font-semibold">--</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Radar Chart -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-area text-purple-600 mr-2"></i> Profilo Maturità
+                </h3>
+                <canvas id="radarChart"></canvas>
+            </div>
+            
+            <!-- Bar Chart Comparison -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-bar text-purple-600 mr-2"></i> Confronto con il Settore
+                </h3>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Recommendations Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i> Raccomandazioni Prioritizzate
+            </h2>
+            <div id="recommendations-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Benchmark Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-trophy text-purple-600 mr-2"></i> Benchmark Settoriale
+            </h2>
+            <div class="space-y-6" id="benchmarks-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="downloadPDF()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg font-semibold transition shadow-lg">
+                <i class="fas fa-file-pdf mr-2"></i> Scarica Report PDF
+            </button>
+            <button onclick="shareResults()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition shadow-lg">
+                <i class="fas fa-share-alt mr-2"></i> Condividi Risultati
+            </button>
+            <a href="/assessment" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded-lg font-semibold transition shadow-lg text-center">
+                <i class="fas fa-redo mr-2"></i> Nuova Valutazione
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Load results from sessionStorage
+const results = JSON.parse(sessionStorage.getItem('gist_results'));
+
+if (!results) {
+    window.location.href = '/assessment';
+} else {
+    displayResults(results);
+}
+
+function displayResults(data) {
+    // Display main score
+    document.getElementById('org-name').textContent = data.organization;
+    animateCounter('gist-score', 0, data.gist_score, 1500);
+    document.getElementById('maturity-level').textContent = data.maturity_level.level;
+    document.getElementById('maturity-description').textContent = data.maturity_level.description;
+    
+    // Set maturity color
+    document.querySelector('.score-card').style.background = 
+        `linear-gradient(135deg, ${data.maturity_level.color} 0%, ${adjustColor(data.maturity_level.color, -30)} 100%)`;
+    
+    // Display component scores
+    const components = ['physical', 'architectural', 'security', 'compliance'];
+    components.forEach(comp => {
+        document.getElementById(`score-${comp}`).textContent = 
+            Math.round(data.component_scores[comp]);
+        
+        const vsDiff = data.component_scores[comp] - data.benchmarks[comp].sector_avg;
+        const vsElement = document.getElementById(`vs-${comp}`);
+        vsElement.textContent = (vsDiff >= 0 ? '+' : '') + vsDiff.toFixed(1);
+        vsElement.classList.add(vsDiff >= 0 ? 'text-green-600' : 'text-red-600');
+    });
+    
+    // Create charts
+    createRadarChart(data);
+    createBarChart(data);
+    
+    // Display recommendations
+    displayRecommendations(data.recommendations);
+    
+    // Display benchmarks
+    displayBenchmarks(data.benchmarks);
+}
+
+function animateCounter(id, start, end, duration) {
+    const element = document.getElementById(id);
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= end) {
+            element.textContent = end.toFixed(1);
+            clearInterval(timer);
+        } else {
+            element.textContent = current.toFixed(1);
+        }
+    }, 16);
+}
+
+function createRadarChart(data) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Infrastruttura', 'Architettura', 'Sicurezza', 'Conformità'],
+            datasets: [{
+                label: 'Tuo Score',
+                data: [
+                    data.component_scores.physical,
+                    data.component_scores.architectural,
+                    data.component_scores.security,
+                    data.component_scores.compliance
+                ],
+                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 2
+            }, {
+                label: 'Media Settore',
+                data: [
+                    data.benchmarks.physical.sector_avg,
+                    data.benchmarks.architectural.sector_avg,
+                    data.benchmarks.security.sector_avg,
+                    data.benchmarks.compliance.sector_avg
+                ],
+                backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                borderColor: 'rgba(156, 163, 175, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5]
+            }, {
+                label: 'Target',
+                data: [
+                    data.benchmarks.physical.target,
+                    data.benchmarks.architectural.target,
+                    data.benchmarks.security.target,
+                    data.benchmarks.compliance.target
+                ],
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 2,
+                borderDash: [2, 2]
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { stepSize: 20 }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+}
+
+function createBarChart(data) {
+    const ctx = document.getElementById('barChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Fisica', 'Architettura', 'Sicurezza', 'Conformità'],
+            datasets: [{
+                label: 'Tuo Score',
+                data: [
+                    data.component_scores.physical,
+                    data.component_scores.architectural,
+                    data.component_scores.security,
+                    data.component_scores.compliance
+                ],
+                backgroundColor: ['#3B82F6', '#A855F7', '#EF4444', '#10B981']
+            }, {
+                label: 'Media Settore',
+                data: [
+                    data.benchmarks.physical.sector_avg,
+                    data.benchmarks.architectural.sector_avg,
+                    data.benchmarks.security.sector_avg,
+                    data.benchmarks.compliance.sector_avg
+                ],
+                backgroundColor: 'rgba(156, 163, 175, 0.5)'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+}
+
+function displayRecommendations(recommendations) {
+    const container = document.getElementById('recommendations-list');
+    
+    if (!recommendations || recommendations.length === 0) {
+        container.innerHTML = '<p class="text-gray-600">Nessuna raccomandazione al momento.</p>';
+        return;
+    }
+    
+    container.innerHTML = recommendations.map((rec, index) => {
+        const priorityColors = {
+            'CRITICA': 'bg-red-100 text-red-800 border-red-300',
+            'Alta': 'bg-orange-100 text-orange-800 border-orange-300',
+            'Media': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            'Bassa': 'bg-blue-100 text-blue-800 border-blue-300'
+        };
+        
+        return `
+            <div class="border-l-4 border-purple-500 bg-gray-50 p-6 rounded-lg mb-4">
+                <div class="flex justify-between items-start mb-3">
+                    <h4 class="text-lg font-bold text-gray-900">
+                        ${index + 1}. ${rec.component}
+                    </h4>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${priorityColors[rec.priority]} border">
+                        ${rec.priority}
+                    </span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-3 text-sm">
+                    <div>
+                        <span class="text-gray-600">Score Attuale:</span>
+                        <span class="font-bold text-gray-900 ml-1">${rec.current_score}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Target:</span>
+                        <span class="font-bold text-gray-900 ml-1">${rec.target_score}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Gap:</span>
+                        <span class="font-bold text-red-600 ml-1">-${rec.gap}</span>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-3">${rec.action_plan}</p>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span><i class="fas fa-clock mr-1"></i> ${rec.estimated_effort}</span>
+                    <span><i class="fas fa-chart-line mr-1"></i> ROI: ${rec.estimated_roi}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function displayBenchmarks(benchmarks) {
+    const container = document.getElementById('benchmarks-list');
+    const components = ['physical', 'architectural', 'security', 'compliance'];
+    
+    container.innerHTML = components.map(comp => {
+        const data = benchmarks[comp];
+        const percentage = (data.score / data.target) * 100;
+        
+        return `
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-semibold text-gray-900">${data.label}</h4>
+                    <span class="text-sm text-gray-600">
+                        ${data.score} / ${data.target} (${data.percentile}° percentile)
+                    </span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                    <div class="component-bar bg-gradient-to-r from-purple-500 to-indigo-500 h-4 rounded-full" 
+                         style="width: ${percentage}%"></div>
+                    <div class="absolute top-0 left-0 w-full h-4 flex items-center justify-between px-2 text-xs text-white font-semibold">
+                        <span>${percentage.toFixed(0)}%</span>
+                    </div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Media settore: ${data.sector_avg}</span>
+                    <span class="${data.vs_sector >= 0 ? 'text-green-600' : 'text-red-600'} font-semibold">
+                        ${data.vs_sector >= 0 ? '+' : ''}${data.vs_sector}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function adjustColor(color, amount) {
+    return '#' + color.replace(/^#/, '').replace(/../g, color => 
+        ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2)
+    );
+}
+
+function downloadPDF() {
+    alert('Funzionalità PDF in arrivo! Implementeremo con reportlab.');
+}
+
+function shareResults() {
+    const text = `Ho ottenuto un GIST Score di ${results.gist_score}/100! Livello: ${results.maturity_level.level}`;
+    if (navigator.share) {
+        navigator.share({ title: 'GIST Score', text: text });
+    } else {
+        navigator.clipboard.writeText(text);
+        alert('Link copiato negli appunti!');
+    }
+}
+</script>
+{% endblock %}
